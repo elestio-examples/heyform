@@ -1,0 +1,47 @@
+networks:
+  keydb:
+  mongo:
+
+services:
+  heyform:
+    image: heyform/community-edition:${SOFTWARE_VERSION_TAG}
+    restart: always
+    volumes:
+      # Persist uploaded images
+      - ./assets:/app/static/upload
+    depends_on:
+      - mongo
+      - keydb
+    ports:
+      - "172.17.0.1:50884:8000"
+    environment:
+      APP_HOMEPAGE_URL: https://${DOMAIN}
+      SESSION_KEY: key1
+      FORM_ENCRYPTION_KEY: key2
+      MONGO_URI: "mongodb://mongo:27017/heyform?authSource=admin"
+      MONGO_USER: ${MONGO_USER}
+      MONGO_PASSWORD: ${MONGO_PASSWORD}
+      REDIS_HOST: keydb
+      REDIS_PORT: 6379
+      SMTP_FROM: ${SMTP_FROM}
+      SMTP_HOST: ${SMTP_HOST}
+      SMTP_PORT: ${SMTP_PORT}
+      SMTP_IGNORE_CERT: ${SMTP_IGNORE_CERT}
+
+  mongo:
+    image: percona/percona-server-mongodb:4.4
+    restart: always
+    volumes:
+      # Persist MongoDB data
+      - ./database:/data/db
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_USER}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD}
+
+  keydb:
+    image: eqalpha/keydb:latest
+    restart: always
+    command: keydb-server --appendonly yes --protected-mode no
+    volumes:
+      # Persist KeyDB data
+      - ./keydb:/data
