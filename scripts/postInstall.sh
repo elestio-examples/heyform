@@ -15,4 +15,14 @@ curl 'https://'${DOMAIN}'/graphql' \
   -H 'user-agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36' \
   -H 'x-anonymous-id: '${ADMIN_PASSWORD}'' \
   -H 'x-browser-id: '${ADMIN_PASSWORD}'' \
-  --data-raw $'{"operationName":"signUp","variables":{"input":{"name":"admin","email":"'${ADMIN_EMAIL}'","password":"'${ADMIN_PASSWORD}'"}},"query":"query signUp($input: SignUpInput\u0021) {\\n  signUp(input: $input)\\n}\\n"}'
+  --data-raw '{
+    "operationName": "signUp",
+    "variables": {
+      "input": {
+        "name": "admin",
+        "email": "'"${ADMIN_EMAIL}"'",
+        "password": "'"${ADMIN_PASSWORD}"'"
+      }
+    },
+    "query": "query signUp($input: SignUpInput!) { signUp(input: $input) }"
+  }'
